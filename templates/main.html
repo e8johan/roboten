@@ -18,28 +18,18 @@ function onDriveClicked()
   xhr.send();
 }
 
-var source = new EventSource('/infostream');
+var source = new EventSource("/infostream");
 source.onmessage = function (event) {
   alert(event.data);
 }
 </script>
 
 <body>
-   <h1>RPi Web Server</h1>
+   <h1>Roboten</h1>
 
   <div class="row"><div class="col-md-2">
   <a onclick="onDriveClicked();" class="btn btn-block btn-lg btn-default" role="button">Drive</a>
   </div></div>
 
-   {% for pin in pins %}
-   <h2>{{ pins[pin].name }}
-   {% if pins[pin].state == true %}
-      is currently <strong>on</strong></h2><div class="row"><div class="col-md-2">
-      <a href="/pins/{{pin}}/off" class="btn btn-block btn-lg btn-default" role="button">Turn off</a></div></div>
-   {% else %}
-      is currently <strong>off</strong></h2><div class="row"><div class="col-md-2">
-      <a href="/pins/{{pin}}/on" class="btn btn-block btn-lg btn-primary" role="button">Turn on</a></div></div>
-   {% endif %}
-   {% endfor %}
 </body>
 </html>
