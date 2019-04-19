@@ -30,7 +30,7 @@ def action_upgrade():
 @app.route("/actions/forward", methods=["POST"])
 def action_forward():
     is_driving = True
-    kit.continuous_servo[0].throttle = 0.2
+    kit.continuous_servo[0].throttle = 0.3
     kit.continuous_servo[1].throttle = -0.2
     msg_queue.put("driving")
     drive_timer = Timer(2, drive_timeout)
@@ -42,7 +42,7 @@ def action_forward():
 def action_reverse():
     is_driving = True
     kit.continuous_servo[0].throttle = -0.2
-    kit.continuous_servo[1].throttle = 0.2
+    kit.continuous_servo[1].throttle = 0.3
     msg_queue.put("driving")
     drive_timer = Timer(2, drive_timeout)
     drive_timer.start()
