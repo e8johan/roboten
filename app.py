@@ -27,17 +27,39 @@ def action_upgrade():
     os.system("git pull")
     exit()
 
-@app.route("/actions/<action>", methods=["POST"])
-def take_action(action):
-    if action == 'drive':
-#        if not is_driving:
-            is_driving = True
-            kit.continuous_servo[0].throttle = 0.2
-            kit.continuous_servo[1].throttle = -0.2
-            kit.servo[15].angle = 0
-            msg_queue.put("driving")
-            drive_timer = Timer(2, drive_timeout)
-            drive_timer.start()
+@app.route("/actions/drive", methods=["POST"])
+def action_drive():
+    is_driving = True
+    kit.continuous_servo[0].throttle = 0.2
+    kit.continuous_servo[1].throttle = -0.2
+    kit.servo[15].angle = 0
+    msg_queue.put("driving")
+    drive_timer = Timer(2, drive_timeout)
+    drive_timer.start()
+
+    return jsonify([])
+
+@app.route("/actions/left", methods=["POST"])
+def action_left():
+    is_driving = True
+    kit.continuous_servo[0].throttle = 0.5
+    kit.continuous_servo[1].throttle = 0
+    kit.servo[15].angle = 0
+    msg_queue.put("left")
+    drive_timer = Timer(1, drive_timeout)
+    drive_timer.start()
+
+    return jsonify([])
+
+@app.route("/actions/right", methods=["POST"])
+def action_right():
+    is_driving = True
+    kit.continuous_servo[0].throttle = 0
+    kit.continuous_servo[1].throttle = 0.5
+    kit.servo[15].angle = 0
+    msg_queue.put("right")
+    drive_timer = Timer(0.5, drive_timeout)
+    drive_timer.start()
 
     return jsonify([])
 
