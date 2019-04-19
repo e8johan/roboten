@@ -72,14 +72,14 @@ def action_right():
     return jsonify([])
 
 @app.route("/actions/up", methods=["POST"])
-def action_forward():
+def action_up():
     kit.servo[15].angle = 0
     msg_queue.put("up")
 
     return jsonify([])
 
 @app.route("/actions/down", methods=["POST"])
-def action_forward():
+def action_down():
     kit.servo[15].angle = 180
     msg_queue.put("down")
 
