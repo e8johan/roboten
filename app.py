@@ -71,6 +71,20 @@ def action_right():
 
     return jsonify([])
 
+@app.route("/actions/up", methods=["POST"])
+def action_forward():
+    kit.servo[15].angle = 0
+    msg_queue.put("up")
+
+    return jsonify([])
+
+@app.route("/actions/down", methods=["POST"])
+def action_forward():
+    kit.servo[15].angle = 180
+    msg_queue.put("down")
+
+    return jsonify([])
+
 @app.route("/resting_throttle", methods=["GET"])
 def get_resting_throttles():
     return jsonify({'0': resting_throttle[0], '1': resting_throttle[1]})

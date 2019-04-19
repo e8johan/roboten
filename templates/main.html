@@ -17,7 +17,7 @@ function onActionClicked(action)
 
 var source = new EventSource("/infostream");
 source.onmessage = function (event) {
-  console.log(event.data);
+  document.getElementById("logmessage").innerHTML = event.data
 }
 </script>
 
@@ -34,6 +34,7 @@ source.onmessage = function (event) {
   </div>
   <div class="col-md-3">&nbsp;</div>
   </div>
+  <div style="margin-bottom: 10px;">&nbsp;</div>
   <div class="row">
   <div class="col-md-6">
   <a onclick="onActionClicked('left');" class="btn btn-block btn-lg btn-default" role="button">&lt;==</a>
@@ -42,6 +43,7 @@ source.onmessage = function (event) {
   <a onclick="onActionClicked('right');" class="btn btn-block btn-lg btn-default" role="button">==&gt;</a>
   </div>
   </div>
+  <div style="margin-bottom: 10px;">&nbsp;</div>
   <div class="row">
   <div class="col-md-3">&nbsp;</div>
   <div class="col-md-6">
@@ -49,7 +51,24 @@ source.onmessage = function (event) {
   </div>
   <div class="col-md-3">&nbsp;</div>
   </div>
-  <div style="margin-bottom: 200px;">&nbsp;</div>
+  
+  <div style="margin-bottom: 40px;">&nbsp;</div>
+  
+  <div class="row">
+  <div class="col-md-6">
+  <a onclick="onActionClicked('up');" class="btn btn-block btn-lg btn-default" role="button">Up</a>
+  </div>
+  <div class="col-md-6">
+  <a onclick="onActionClicked('down');" class="btn btn-block btn-lg btn-default" role="button">Down</a>
+  </div>
+  </div>
+  
+  <div style="margin-bottom: 40px;">&nbsp;</div>
+  
+  <div style="text-align: center;" id="logmessage">&nbsp;</div>
+  
+  <div style="margin-bottom: 120px;">&nbsp;</div>
+  
   <a onclick="onActionClicked('upgrade');" class="btn btn-block btn-lg btn-warning" role="button">Upgrade</a>
   <a onclick="onActionClicked('shutdown');" class="btn btn-block btn-lg btn-warning" role="button">Shutdown</a>
   
