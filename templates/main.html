@@ -7,9 +7,9 @@
 </head>
 
 <script type="text/javascript" language="javascript">
-function onDriveClicked()
+function onActionClicked(action)
 {
-  var url = "/actions/drive";
+  var url = "/actions/" + action;
   var xhr = new XMLHttpRequest();
   xhr.open("POST", url);
   xhr.send();
@@ -25,7 +25,9 @@ source.onmessage = function (event) {
    <h1>Roboten</h1>
 
   <div class="row"><div class="col-md-2">
-  <a onclick="onDriveClicked();" class="btn btn-block btn-lg btn-default" role="button">Drive</a>
+  <a onclick="onActionClicked('drive');" class="btn btn-block btn-lg btn-default" role="button">Drive</a>
+  <a onclick="onActionClicked('upgrade');" class="btn btn-block btn-lg btn-default" role="button">Upgrade</a>
+  <a onclick="onActionClicked('shutdown');" class="btn btn-block btn-lg btn-default" role="button">Shutdown</a>
   </div></div>
 
 </body>
