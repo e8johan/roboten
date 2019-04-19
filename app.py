@@ -42,11 +42,11 @@ def action_drive():
 @app.route("/actions/left", methods=["POST"])
 def action_left():
     is_driving = True
-    kit.continuous_servo[0].throttle = 0.5
-    kit.continuous_servo[1].throttle = 0
+    kit.continuous_servo[0].throttle = 0
+    kit.continuous_servo[1].throttle = -0.5
     kit.servo[15].angle = 0
     msg_queue.put("left")
-    drive_timer = Timer(1, drive_timeout)
+    drive_timer = Timer(0.5, drive_timeout)
     drive_timer.start()
 
     return jsonify([])
@@ -54,8 +54,8 @@ def action_left():
 @app.route("/actions/right", methods=["POST"])
 def action_right():
     is_driving = True
-    kit.continuous_servo[0].throttle = 0
-    kit.continuous_servo[1].throttle = 0.5
+    kit.continuous_servo[0].throttle = 0.5
+    kit.continuous_servo[1].throttle = 0
     kit.servo[15].angle = 0
     msg_queue.put("right")
     drive_timer = Timer(0.5, drive_timeout)
