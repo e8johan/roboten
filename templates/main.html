@@ -17,7 +17,7 @@ function onDriveClicked()
 
 var source = new EventSource("/infostream");
 source.onmessage = function (event) {
-  alert(event.data);
+  console.log(event.data);
 }
 </script>
 

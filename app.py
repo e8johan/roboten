@@ -3,38 +3,52 @@ from threading import Timer
 from queue import Queue
 from adafruit_servokit import ServoKit
 
+import os
+
 app = Flask(__name__)
 
 kit = ServoKit(channels=16)
 is_driving = False
 msg_queue = Queue()
 
-resting_throttle = [0.0, 0.0]
+resting_throttle = [0.07, 0.07]
 
 @app.route("/")
 def main():
    templateData = {}
    return render_template('main.html', **templateData)
 
+@app.route("/actions/shutdown", methods=["POST"])
+def action_shutdown():
+    os.system("sudo shutdown -h now")
+
+@app.route("/actions/upgrade", methods=["POST"])
+def action_upgrade():
+    os.system("git pull")
+    exit()
+
 @app.route("/actions/<action>", methods=["POST"])
 def take_action(action):
     if action == 'drive':
 #        if not is_driving:
             is_driving = True
-            kit.continuous_servo[0].throttle = 1
-            kit.continuous_servo[1].throttle = 1
+            kit.continuous_servo[0].throttle = 0.2
+            kit.continuous_servo[1].throttle = -0.2
             kit.servo[15].angle = 0
             msg_queue.put("driving")
-            drive_timer = Timer(5, drive_timeout)
+            drive_timer = Timer(2, drive_timeout)
             drive_timer.start()
 
     return jsonify([])
+
+@app.route("/resting_throttle", methods=["GET"])
+def get_resting_throttles():
+    return jsonify({'0': resting_throttle[0], '1': resting_throttle[1]})
 
 @app.route("/resting_throttle/<channel>", methods=["GET"])
 def get_resting_throttle(channel):
     return jsonify({channel: resting_throttle[int(channel)]})
     
-
 @app.route("/resting_throttle/<channel>/<value>", methods=["POST"])
 def set_resting_throttle(channel, value):
     channel = int(channel)
