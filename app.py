@@ -27,12 +27,22 @@ def action_upgrade():
     os.system("git pull")
     exit()
 
-@app.route("/actions/drive", methods=["POST"])
-def action_drive():
+@app.route("/actions/forward", methods=["POST"])
+def action_forward():
     is_driving = True
     kit.continuous_servo[0].throttle = 0.2
     kit.continuous_servo[1].throttle = -0.2
-    kit.servo[15].angle = 0
+    msg_queue.put("driving")
+    drive_timer = Timer(2, drive_timeout)
+    drive_timer.start()
+
+    return jsonify([])
+
+@app.route("/actions/reverse", methods=["POST"])
+def action_reverse():
+    is_driving = True
+    kit.continuous_servo[0].throttle = -0.2
+    kit.continuous_servo[1].throttle = 0.2
     msg_queue.put("driving")
     drive_timer = Timer(2, drive_timeout)
     drive_timer.start()
@@ -44,7 +54,6 @@ def action_left():
     is_driving = True
     kit.continuous_servo[0].throttle = 0
     kit.continuous_servo[1].throttle = -0.5
-    kit.servo[15].angle = 0
     msg_queue.put("left")
     drive_timer = Timer(0.5, drive_timeout)
     drive_timer.start()
@@ -56,7 +65,6 @@ def action_right():
     is_driving = True
     kit.continuous_servo[0].throttle = 0.5
     kit.continuous_servo[1].throttle = 0
-    kit.servo[15].angle = 0
     msg_queue.put("right")
     drive_timer = Timer(0.5, drive_timeout)
     drive_timer.start()
@@ -85,7 +93,6 @@ def drive_timeout():
     is_driving = False
     kit.continuous_servo[0].throttle = resting_throttle[0]
     kit.continuous_servo[1].throttle = resting_throttle[1]
-    kit.servo[15].angle = 180
     msg_queue.put("not driving")
 
 @app.route('/infostream')
