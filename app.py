@@ -1,8 +1,14 @@
 from flask import Flask, render_template, request, jsonify, Response
 from threading import Timer
 from queue import Queue
+
 from adafruit_servokit import ServoKit
 
+import picamera
+import cv2
+import socket
+
+import io
 import os
 
 app = Flask(__name__)
@@ -116,5 +122,21 @@ def info_stream():
             yield "data: {}\n\n".format(msg_queue.get())
     return Response(the_stream(), mimetype="text/event-stream")
 
+def gen():
+    """Video streaming generator function."""
+    while True:
+        rval, frame = vc.read()
+        cv2.imwrite('t.jpg', frame)
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + open('t.jpg', 'rb').read() + b'\r\n')
+
+
+@app.route('/camera')
+def camera():
+    """Video streaming route. Put this in the src attribute of an img tag."""
+    return Response(gen(),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+
 if __name__ == "__main__":
    app.run(host='0.0.0.0', port=8080, debug=True, threaded=True)
+
