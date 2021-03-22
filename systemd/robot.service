@@ -1,0 +1,16 @@
+[Unit]
+Description=Robotens program
+
+Wants=network.target
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/pi/roboten/
+ExecStart=/home/pi/roboten/venv/bin/python3 /home/pi/roboten/app.py
+Restart=always
+RestartSec=3s
+
+[Install]
+WantedBy=multi-user.target
+
