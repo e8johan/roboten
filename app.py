@@ -12,6 +12,24 @@ import os
 
 app = Flask(__name__)
 
+# taken from https://picamera.readthedocs.io/en/release-1.13/recipes2.html#web-streaming
+class StreamingOutput(object):
+    def __init__(self):
+        self.frame = None
+        self.buffer = io.BytesIO()
+        self.condition = Condition()
+
+    def write(self, buf):
+        if buf.startswith(b'\xff\xd8'):
+            # New frame, copy the existing buffer's content and notify all
+            # clients it's available
+            self.buffer.truncate()
+            with self.condition:
+                self.frame = self.buffer.getvalue()
+                self.condition.notify_all()
+            self.buffer.seek(0)
+        return self.buffer.write(buf)
+
 output = StreamingOutput()
 
 kit = ServoKit(channels=16)
@@ -122,24 +140,6 @@ def info_stream():
         while True:
             yield "data: {}\n\n".format(msg_queue.get())
     return Response(the_stream(), mimetype="text/event-stream")
-
-# taken from https://picamera.readthedocs.io/en/release-1.13/recipes2.html#web-streaming
-class StreamingOutput(object):
-    def __init__(self):
-        self.frame = None
-        self.buffer = io.BytesIO()
-        self.condition = Condition()
-
-    def write(self, buf):
-        if buf.startswith(b'\xff\xd8'):
-            # New frame, copy the existing buffer's content and notify all
-            # clients it's available
-            self.buffer.truncate()
-            with self.condition:
-                self.frame = self.buffer.getvalue()
-                self.condition.notify_all()
-            self.buffer.seek(0)
-        return self.buffer.write(buf)
 
 def stream_generator():
     yield (b'--frame\r\n'
