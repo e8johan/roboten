@@ -150,8 +150,8 @@ def camera():
     return Response(stream_generator(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == "__main__":
-    with picamera.PiCamera(resolution='640x480', framerate=24) as camera:
-        camera.start_recording(output, format='mjpeg')
+#    with picamera.PiCamera(resolution='640x480', framerate=24) as camera:
+#        camera.start_recording(output, format='mjpeg')
     
-        app.run(host='0.0.0.0', port=8080, debug=True, threaded=True)
+    app.run(host='0.0.0.0', port=8080, debug=True, threaded=True)
 
