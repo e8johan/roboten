@@ -4,6 +4,8 @@ from queue import Queue
 
 from adafruit_servokit import ServoKit
 
+from camera_pi import Camera
+
 import picamera
 import socket
 
@@ -11,26 +13,6 @@ import io
 import os
 
 app = Flask(__name__)
-
-# taken from https://picamera.readthedocs.io/en/release-1.13/recipes2.html#web-streaming
-class StreamingOutput(object):
-    def __init__(self):
-        self.frame = None
-        self.buffer = io.BytesIO()
-        self.condition = Condition()
-
-    def write(self, buf):
-        if buf.startswith(b'\xff\xd8'):
-            # New frame, copy the existing buffer's content and notify all
-            # clients it's available
-            self.buffer.truncate()
-            with self.condition:
-                self.frame = self.buffer.getvalue()
-                self.condition.notify_all()
-            self.buffer.seek(0)
-        return self.buffer.write(buf)
-
-output = StreamingOutput()
 
 kit = ServoKit(channels=16)
 is_driving = False
@@ -141,17 +123,17 @@ def info_stream():
             yield "data: {}\n\n".format(msg_queue.get())
     return Response(the_stream(), mimetype="text/event-stream")
 
-def stream_generator():
-    yield (b'--frame\r\n'
-           b'Content-Type: image/jpeg\r\nContent-Length: ' + len(output.frame) + b'\r\n\r\n' + output.frame + b'\r\n')
+def stream_generator(camera):
+    while True:
+        frame camera.get_frame()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 @app.route('/camera_stream')
 def camera():
-    return Response(stream_generator(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(stream_generator(Camera()), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 if __name__ == "__main__":
-#    with picamera.PiCamera(resolution='640x480', framerate=24) as camera:
-#        camera.start_recording(output, format='mjpeg')
     
     app.run(host='0.0.0.0', port=8080, debug=True, threaded=True)
 
