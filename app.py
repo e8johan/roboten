@@ -12,6 +12,8 @@ import os
 
 app = Flask(__name__)
 
+output = StreamingOutput()
+
 kit = ServoKit(channels=16)
 is_driving = False
 msg_queue = Queue()
@@ -121,6 +123,34 @@ def info_stream():
             yield "data: {}\n\n".format(msg_queue.get())
     return Response(the_stream(), mimetype="text/event-stream")
 
+# taken from https://picamera.readthedocs.io/en/release-1.13/recipes2.html#web-streaming
+class StreamingOutput(object):
+    def __init__(self):
+        self.frame = None
+        self.buffer = io.BytesIO()
+        self.condition = Condition()
+
+    def write(self, buf):
+        if buf.startswith(b'\xff\xd8'):
+            # New frame, copy the existing buffer's content and notify all
+            # clients it's available
+            self.buffer.truncate()
+            with self.condition:
+                self.frame = self.buffer.getvalue()
+                self.condition.notify_all()
+            self.buffer.seek(0)
+        return self.buffer.write(buf)
+
+def stream_generator():
+    yield (b'--frame\r\n'
+           b'Content-Type: image/jpeg\r\nContent-Length: ' + len(output.frame) + b'\r\n\r\n' + output.frame + b'\r\n')
+
+@app.route('/camera_stream')
+def camera():
+    return Response(stream_generator(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
 if __name__ == "__main__":
-   app.run(host='0.0.0.0', port=8080, debug=True, threaded=True)
+    camera.start_recording(output, format='mjpeg')
+    
+    app.run(host='0.0.0.0', port=8080, debug=True, threaded=True)
 
